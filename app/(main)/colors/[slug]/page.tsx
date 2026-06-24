@@ -84,11 +84,11 @@ export default async function ColorDetailPage({
               </tr>
               <tr>
                 <th>Generations</th>
-                <td>{color.generations.join(', ')}</td>
+                <td>{color.generations?.join(', ') ?? '—'}</td>
               </tr>
               <tr>
                 <th>Models</th>
-                <td>{color.models.join(', ')}</td>
+                <td>{color.models?.join(', ') ?? '—'}</td>
               </tr>
             </tbody>
           </table>

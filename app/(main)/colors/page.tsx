@@ -20,12 +20,12 @@ export default async function ColorsPage({
   const filteredColors = COLORS.filter((color) => {
     const matchesQuery = !query || [
       color.name,
-      color.code,
+      color.code ?? '',
       color.family,
-      color.availability,
-      color.historical,
-      color.models.join(' '),
-      color.generations.join(' '),
+      color.availability ?? '',
+      color.historical ?? '',
+      (color.models ?? []).join(' '),
+      (color.generations ?? []).join(' '),
     ].some((value) => value.toLowerCase().includes(query))
 
     if (!matchesQuery) return false
