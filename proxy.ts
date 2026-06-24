@@ -13,22 +13,27 @@ export async function proxy(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          )
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
         },
       },
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
   const { pathname } = request.nextUrl
-  const isPublicRoute = ['/login', '/signup', '/auth'].some(p => pathname.startsWith(p))
+
+  if (pathname === '/') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/logbook'
+    return NextResponse.redirect(url)
+  }
+
+  const isPublicRoute = ['/login', '/signup', '/welcome', '/auth'].some((route) => pathname.startsWith(route))
 
   if (!user && !isPublicRoute) {
     const url = request.nextUrl.clone()
@@ -36,13 +41,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  if (user && (pathname === '/login' || pathname === '/signup')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/logbook'
-    return NextResponse.redirect(url)
-  }
-
-  if (user && pathname === '/') {
+  if (user && ['/login', '/signup', '/welcome'].includes(pathname)) {
     const url = request.nextUrl.clone()
     url.pathname = '/logbook'
     return NextResponse.redirect(url)
