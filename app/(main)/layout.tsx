@@ -6,6 +6,7 @@ import { logout } from '@/app/actions'
 import { buildDisplayIdentity, fetchCollectorData } from '@/lib/app-data'
 import NavRail from './components/NavRail'
 import SearchBar from './components/SearchBar'
+import MobileMenuButton from './components/MobileMenuButton'
 
 function SearchFallback() {
   return (
@@ -62,11 +63,7 @@ export default async function MainLayout({ children }: { children: ReactNode }) 
       </aside>
       <main className="main">
         <header className="topbar">
-          <button className="icon-button mobile-menu" id="menuButton" type="button" aria-label="Open navigation">
-            <span />
-            <span />
-            <span />
-          </button>
+          <MobileMenuButton />
           <div className="search-wrap">
             <Suspense fallback={<SearchFallback />}>
               <SearchBar />

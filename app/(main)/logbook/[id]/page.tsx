@@ -59,7 +59,7 @@ export default async function SightingDetailPage({
           </div>
         </div>
         <div className="car-stage" aria-hidden="true">
-          <img src={colorImagePath(color) ?? '/hero-car.png'} alt="" />
+          <img src={sighting.photo_url ?? colorImagePath(color) ?? '/hero-car.png'} alt="" />
         </div>
       </section>
 
