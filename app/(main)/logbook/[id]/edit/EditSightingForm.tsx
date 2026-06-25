@@ -18,6 +18,12 @@ export default function EditSightingForm({ sighting }: { sighting: Sighting }) {
     const formData = new FormData(event.currentTarget)
     formData.set('remove_photo', removePhoto ? 'true' : 'false')
 
+    const photo = formData.get('photo') as File | null
+    if (photo && photo.size > 8 * 1024 * 1024) {
+      setError('Photo must be under 8 MB. Try a smaller or compressed image.')
+      return
+    }
+
     startTransition(async () => {
       const result = await updateSighting(sighting.id, formData)
       if (result?.error) {

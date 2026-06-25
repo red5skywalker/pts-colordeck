@@ -15,6 +15,12 @@ export default function NewSightingPage() {
     setError(null)
 
     const formData = new FormData(event.currentTarget)
+    const photo = formData.get('photo') as File | null
+    if (photo && photo.size > 8 * 1024 * 1024) {
+      setError('Photo must be under 8 MB. Try a smaller or compressed image.')
+      return
+    }
+
     startTransition(async () => {
       const result = await createSighting(formData)
       if (result?.error) {
