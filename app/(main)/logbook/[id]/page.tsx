@@ -50,6 +50,9 @@ export default async function SightingDetailPage({
             {sighting.model_year ? ` · ${sighting.model_year}` : ''} · {color.rarityCategory} · {color.rarityScore} pts
           </p>
           <div className="hero-actions">
+            <Link href={`/logbook/${id}/edit`} className="primary-button" style={{ textDecoration: 'none' }}>
+              Edit sighting
+            </Link>
             <Link href="/logbook" className="ghost-button" style={{ textDecoration: 'none' }}>
               Back to logbook
             </Link>
@@ -63,7 +66,14 @@ export default async function SightingDetailPage({
       <div className="content-grid grid-2" style={{ marginTop: 22 }}>
         <section>
           <article className="sighting-card">
-            <div className="sighting-media" style={{ '--paint-one': color.hex[0], '--paint-two': color.hex[1] } as CSSProperties} />
+            <div
+              className={`sighting-media${sighting.photo_url ? ' has-photo' : ''}`}
+              style={{ '--paint-one': color.hex[0], '--paint-two': color.hex[1] } as CSSProperties}
+            >
+              {sighting.photo_url && (
+                <img src={sighting.photo_url} alt={`${color.name} sighting`} />
+              )}
+            </div>
             <div className="card-body">
               <div className="meta-row">
                 <span className={`rarity-pill ${rarityClass(color.rarityCategory)}`}>{color.rarityCategory}</span>

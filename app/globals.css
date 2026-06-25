@@ -1329,6 +1329,10 @@ aside.panel:not(.content-grid) {
   display: none;
 }
 
+.sighting-media.has-photo::after {
+  display: none;
+}
+
 .paint-image {
   position: absolute;
   inset: 0;

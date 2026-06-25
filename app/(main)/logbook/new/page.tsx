@@ -76,6 +76,10 @@ export default function NewSightingPage() {
               <label htmlFor="notes">Notes</label>
               <textarea id="notes" name="notes" placeholder="What made this spot memorable?" />
             </div>
+            <div className="field full">
+              <label htmlFor="photo">Your photo <span style={{ fontWeight: 400, color: 'var(--muted)' }}>(optional)</span></label>
+              <input id="photo" name="photo" type="file" accept="image/*" />
+            </div>
           </div>
           <div className="form-actions" style={{ marginTop: 16 }}>
             <button className="primary-button" type="submit" disabled={isPending}>

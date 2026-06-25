@@ -69,7 +69,7 @@ export async function createSighting(formData: FormData) {
     return { error: 'Model, date, and location are required.' }
   }
 
-  const { error } = await supabase.from('sighting').insert({
+  const { data: inserted, error } = await supabase.from('sighting').insert({
     user_id: user.id,
     color_slug: colorSlug,
     color_name: color.name,
@@ -81,12 +81,97 @@ export async function createSighting(formData: FormData) {
     spotted_on: spottedOn,
     location_label: locationLabel,
     notes,
-  })
+  }).select('id').single()
+
+  if (error) return { error: error.message }
+
+  const photoFile = formData.get('photo') as File | null
+  if (photoFile && photoFile.size > 0) {
+    const ext = photoFile.type.split('/')[1] || 'jpg'
+    const path = `${user.id}/${inserted.id}.${ext}`
+    const { error: uploadError } = await supabase.storage
+      .from('sighting-photos')
+      .upload(path, photoFile)
+    if (!uploadError) {
+      const { data: { publicUrl } } = supabase.storage.from('sighting-photos').getPublicUrl(path)
+      await supabase.from('sighting').update({ photo_url: publicUrl }).eq('id', inserted.id)
+    }
+  }
+
+  revalidatePath('/logbook')
+  redirect('/logbook')
+}
+
+export async function updateSighting(id: string, formData: FormData) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: existing } = await supabase
+    .from('sighting')
+    .select('id, photo_url')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  if (!existing) return { error: 'Sighting not found.' }
+
+  const colorSlug = formData.get('color_slug') as string
+  const color = getColorBySlug(colorSlug)
+  if (!color) return { error: 'Invalid color selected.' }
+
+  const model = formData.get('model') as string
+  const modelYear = formData.get('model_year') ? parseInt(formData.get('model_year') as string) : null
+  const spottedOn = formData.get('spotted_on') as string
+  const locationLabel = formData.get('location_label') as string
+  const notes = (formData.get('notes') as string) || null
+  const removePhoto = formData.get('remove_photo') === 'true'
+
+  if (!model || !spottedOn || !locationLabel) {
+    return { error: 'Model, date, and location are required.' }
+  }
+
+  let photoUrl: string | null = existing.photo_url ?? null
+  if (removePhoto) {
+    photoUrl = null
+  } else {
+    const photoFile = formData.get('photo') as File | null
+    if (photoFile && photoFile.size > 0) {
+      const ext = photoFile.type.split('/')[1] || 'jpg'
+      const path = `${user.id}/${id}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('sighting-photos')
+        .upload(path, photoFile, { upsert: true })
+      if (!uploadError) {
+        const { data: { publicUrl } } = supabase.storage.from('sighting-photos').getPublicUrl(path)
+        photoUrl = publicUrl
+      }
+    }
+  }
+
+  const { error } = await supabase
+    .from('sighting')
+    .update({
+      color_slug: colorSlug,
+      color_name: color.name,
+      color_family: color.family,
+      color_hex: color.hex[0],
+      rarity: color.rarityCategory,
+      model,
+      model_year: modelYear,
+      spotted_on: spottedOn,
+      location_label: locationLabel,
+      notes,
+      photo_url: photoUrl,
+    })
+    .eq('id', id)
+    .eq('user_id', user.id)
 
   if (error) return { error: error.message }
 
   revalidatePath('/logbook')
-  redirect('/logbook')
+  redirect(`/logbook/${id}`)
 }
 
 export async function deleteSighting(id: string) {

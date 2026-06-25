@@ -31,9 +31,22 @@ create table if not exists public.sighting (
   spotted_on     date not null,
   location_label text not null,
   notes          text,
+  photo_url      text,
   created_at     timestamptz not null default now(),
   updated_at     timestamptz not null default now()
 );
+
+-- Storage bucket for sighting photos (run once in Supabase Dashboard → Storage)
+-- insert into storage.buckets (id, name, public) values ('sighting-photos', 'sighting-photos', true);
+-- create policy "Users can upload own sighting photos"
+--   on storage.objects for insert
+--   with check (bucket_id = 'sighting-photos' and auth.uid()::text = (storage.foldername(name))[1]);
+-- create policy "Users can update own sighting photos"
+--   on storage.objects for update
+--   using (bucket_id = 'sighting-photos' and auth.uid()::text = (storage.foldername(name))[1]);
+-- create policy "Anyone can view sighting photos"
+--   on storage.objects for select
+--   using (bucket_id = 'sighting-photos');
 
 create index if not exists sighting_user_idx on public.sighting(user_id, spotted_on desc);
 

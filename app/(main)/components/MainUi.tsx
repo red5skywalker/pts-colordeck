@@ -38,67 +38,69 @@ export function ColorCard({ color }: { color: PorscheColor }) {
   const imagePath = colorImagePath(color)
 
   return (
-    <article className="color-card">
-      <div
-        className={`paint-photo ${color.imageFile ? 'has-photo' : ''}`}
-        style={{ '--paint-one': color.hex[0], '--paint-two': color.hex[1] } as CSSProperties}
-      >
-        {imagePath && (
-          <img
-            className="paint-image"
-            src={imagePath}
-            alt={`${color.name} Porsche`}
-            loading="lazy"
-          />
-        )}
-        <span className={`rarity-pill ${rarityClass(color.rarityCategory)}`}>{color.rarityCategory}</span>
-      </div>
-      <div className="card-body">
-        <div className="meta-row">
-          <span className="family-pill">{color.family}</span>
-          <span>{color.code}</span>
-          <span>{color.availability}</span>
+    <Link href={`/colors/${color.slug}`} style={{ textDecoration: 'none', display: 'block' }}>
+      <article className="color-card">
+        <div
+          className={`paint-photo ${color.imageFile ? 'has-photo' : ''}`}
+          style={{ '--paint-one': color.hex[0], '--paint-two': color.hex[1] } as CSSProperties}
+        >
+          {imagePath && (
+            <img
+              className="paint-image"
+              src={imagePath}
+              alt={`${color.name} Porsche`}
+              loading="lazy"
+            />
+          )}
+          <span className={`rarity-pill ${rarityClass(color.rarityCategory)}`}>{color.rarityCategory}</span>
         </div>
-        <h3 style={{ marginTop: 10 }}>{color.name}</h3>
-        <p>{color.historical}</p>
-        <div className="card-footer">
-          <span className="points">{color.rarityScore} pts</span>
-          <Link href={`/colors/${color.slug}`} className="ghost-button" style={{ textDecoration: 'none' }}>
-            Details
-          </Link>
+        <div className="card-body">
+          <div className="meta-row">
+            <span className="family-pill">{color.family}</span>
+            <span>{color.code}</span>
+            <span>{color.availability}</span>
+          </div>
+          <h3 style={{ marginTop: 10 }}>{color.name}</h3>
+          <p>{color.historical}</p>
+          <div className="card-footer">
+            <span className="points">{color.rarityScore} pts</span>
+          </div>
         </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   )
 }
 
 export function SightingCard({ sighting, color }: { sighting: Sighting; color: PorscheColor }) {
   return (
-    <article className="sighting-card">
-      <div
-        className="sighting-media"
-        style={{ '--paint-one': color.hex[0], '--paint-two': color.hex[1] } as CSSProperties}
-      />
-      <div className="card-body">
-        <div className="meta-row">
-          <span className={`rarity-pill ${rarityClass(color.rarityCategory)}`}>{color.rarityCategory}</span>
+    <Link href={`/logbook/${sighting.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+      <article className="sighting-card">
+        <div
+          className={`sighting-media${sighting.photo_url ? ' has-photo' : ''}`}
+          style={{ '--paint-one': color.hex[0], '--paint-two': color.hex[1] } as CSSProperties}
+        >
+          {sighting.photo_url && (
+            <img src={sighting.photo_url} alt={`${color.name} sighting`} />
+          )}
         </div>
-        <h3 style={{ marginTop: 10 }}>{color.name}</h3>
-        <p>{sighting.notes ?? 'No notes yet.'}</p>
-        <div className="meta-row">
-          <span>{sighting.model}</span>
-          <span>{sighting.model_year ?? ''}</span>
-          <span>{sighting.location_label}</span>
-          <span>{formatDate(sighting.spotted_on)}</span>
+        <div className="card-body">
+          <div className="meta-row">
+            <span className={`rarity-pill ${rarityClass(color.rarityCategory)}`}>{color.rarityCategory}</span>
+          </div>
+          <h3 style={{ marginTop: 10 }}>{color.name}</h3>
+          <p>{sighting.notes ?? 'No notes yet.'}</p>
+          <div className="meta-row">
+            <span>{sighting.model}</span>
+            <span>{sighting.model_year ?? ''}</span>
+            <span>{sighting.location_label}</span>
+            <span>{formatDate(sighting.spotted_on)}</span>
+          </div>
+          <div className="card-footer" style={{ marginTop: 14 }}>
+            <span className="points">{color.rarityScore} pts</span>
+          </div>
         </div>
-        <div className="card-footer" style={{ marginTop: 14 }}>
-          <span className="points">{color.rarityScore} pts</span>
-          <Link href={`/logbook/${sighting.id}`} className="ghost-button" style={{ textDecoration: 'none' }}>
-            View
-          </Link>
-        </div>
-      </div>
-    </article>
+      </article>
+    </Link>
   )
 }
 
