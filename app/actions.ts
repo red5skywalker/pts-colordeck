@@ -125,6 +125,25 @@ export async function updateSighting(id: string, formData: FormData) {
 
   if (!existing) return { error: 'Sighting not found.' }
 
+  // Auto-migrate legacy photo_url into sighting_photo if not yet done
+  if (existing.photo_url) {
+    const { count } = await supabase
+      .from('sighting_photo')
+      .select('id', { count: 'exact', head: true })
+      .eq('sighting_id', id)
+    if ((count ?? 0) === 0) {
+      await supabase.from('sighting_photo').insert({
+        sighting_id: id,
+        photo_url: existing.photo_url,
+        photo_position: '50% 50%',
+        photo_scale: 1,
+        sort_order: 0,
+      })
+    }
+    // Always clear the legacy column so the fallback never resurfaces
+    await supabase.from('sighting').update({ photo_url: null }).eq('id', id)
+  }
+
   const colorSlug = formData.get('color_slug') as string
   const color = getColorBySlug(colorSlug)
   if (!color) return { error: 'Invalid color selected.' }
