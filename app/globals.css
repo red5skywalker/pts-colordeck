@@ -1878,3 +1878,44 @@ aside.panel:not(.content-grid) {
   display: flex;
   align-items: center;
 }
+
+/* ── Carousel arrows ─────────────────────────────────────────── */
+.photo-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.40);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 22px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.18s, background 0.18s;
+  padding: 0;
+}
+
+.photo-carousel:hover .photo-carousel-arrow {
+  opacity: 1;
+}
+
+.photo-carousel-arrow:hover {
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.photo-carousel-arrow--prev { left: 8px; }
+.photo-carousel-arrow--next { right: 8px; }
+
+/* Always visible on touch devices */
+@media (hover: none) {
+  .photo-carousel-arrow {
+    opacity: 0.75;
+  }
+}

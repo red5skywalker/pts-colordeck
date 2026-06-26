@@ -64,6 +64,24 @@ export default function PhotoCarousel({ photos, altPrefix = 'Sighting photo' }: 
           </div>
         ))}
       </div>
+
+      <button
+        className="photo-carousel-arrow photo-carousel-arrow--prev"
+        onClick={() => goTo(Math.max(0, activeIdx - 1))}
+        aria-label="Previous photo"
+        hidden={activeIdx === 0}
+      >
+        ‹
+      </button>
+      <button
+        className="photo-carousel-arrow photo-carousel-arrow--next"
+        onClick={() => goTo(Math.min(photos.length - 1, activeIdx + 1))}
+        aria-label="Next photo"
+        hidden={activeIdx === photos.length - 1}
+      >
+        ›
+      </button>
+
       <div className="photo-carousel-dots" aria-hidden="true">
         {photos.map((_, i) => (
           <button
