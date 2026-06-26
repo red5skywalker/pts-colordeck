@@ -87,6 +87,7 @@ export async function createSighting(formData: FormData) {
 
   const photoFile = formData.get('photo') as File | null
   const photoPosition = (formData.get('photo_position') as string) || '50% 50%'
+  const photoScale = parseFloat((formData.get('photo_scale') as string) || '1') || 1
   if (photoFile && photoFile.size > 0) {
     const ext = photoFile.type.split('/')[1] || 'jpg'
     const path = `${user.id}/${inserted.id}.${ext}`
@@ -95,7 +96,7 @@ export async function createSighting(formData: FormData) {
       .upload(path, photoFile)
     if (!uploadError) {
       const { data: { publicUrl } } = supabase.storage.from('sighting-photos').getPublicUrl(path)
-      await supabase.from('sighting').update({ photo_url: publicUrl, photo_position: photoPosition }).eq('id', inserted.id)
+      await supabase.from('sighting').update({ photo_url: publicUrl, photo_position: photoPosition, photo_scale: photoScale }).eq('id', inserted.id)
     }
   }
 
@@ -135,12 +136,16 @@ export async function updateSighting(id: string, formData: FormData) {
 
   let photoUrl: string | null = existing.photo_url ?? null
   let photoPosition: string = (existing as { photo_position?: string }).photo_position ?? '50% 50%'
+  let photoScale: number = (existing as { photo_scale?: number }).photo_scale ?? 1
   if (removePhoto) {
     photoUrl = null
     photoPosition = '50% 50%'
+    photoScale = 1
   } else {
     const incomingPosition = (formData.get('photo_position') as string) || '50% 50%'
+    const incomingScale = parseFloat((formData.get('photo_scale') as string) || '1') || 1
     photoPosition = incomingPosition
+    photoScale = incomingScale
     const photoFile = formData.get('photo') as File | null
     if (photoFile && photoFile.size > 0) {
       const ext = photoFile.type.split('/')[1] || 'jpg'
@@ -170,6 +175,7 @@ export async function updateSighting(id: string, formData: FormData) {
       notes,
       photo_url: photoUrl,
       photo_position: photoPosition,
+      photo_scale: photoScale,
     })
     .eq('id', id)
     .eq('user_id', user.id)

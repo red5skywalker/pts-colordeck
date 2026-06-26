@@ -33,6 +33,7 @@ create table if not exists public.sighting (
   notes          text,
   photo_url      text,
   photo_position text not null default '50% 50%',
+  photo_scale    float not null default 1.0,
   created_at     timestamptz not null default now(),
   updated_at     timestamptz not null default now()
 );

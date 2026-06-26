@@ -74,7 +74,11 @@ export default async function SightingDetailPage({
                 <img
                   src={sighting.photo_url}
                   alt={`${color.name} sighting`}
-                  style={{ objectPosition: sighting.photo_position ?? '50% 50%' }}
+                  style={{
+                    objectPosition: sighting.photo_position ?? '50% 50%',
+                    transform: `scale(${sighting.photo_scale ?? 1})`,
+                    transformOrigin: sighting.photo_position ?? '50% 50%',
+                  }}
                 />
               )}
             </div>

@@ -119,6 +119,7 @@ export default function EditSightingForm({ sighting }: { sighting: Sighting }) {
                   <PhotoPositionPicker
                     src={sighting.photo_url}
                     initialPosition={sighting.photo_position ?? '50% 50%'}
+                    initialScale={sighting.photo_scale ?? 1}
                   />
                   <button
                     type="button"
