@@ -909,7 +909,7 @@ aside.panel:not(.content-grid) {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 5px;
+  height: 9px;
   background: linear-gradient(90deg, var(--paint-one), var(--paint-two));
   z-index: 3;
 }
