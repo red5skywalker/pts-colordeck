@@ -3,8 +3,9 @@
 import Link from 'next/link'
 import { useState, useTransition } from 'react'
 import { createSighting } from '@/app/actions'
-import { MODELS } from '@/lib/colors'
+import { MODELS } from '@/lib/models'
 import ColorPicker from '@/app/(main)/components/ColorPicker'
+import SearchableSelect from '@/app/(main)/components/SearchableSelect'
 
 export default function NewSightingForm({ initialColorSlug }: { initialColorSlug?: string }) {
   const [isPending, startTransition] = useTransition()
@@ -19,6 +20,10 @@ export default function NewSightingForm({ initialColorSlug }: { initialColorSlug
 
     if (!formData.get('color_slug')) {
       setError('Please select a color.')
+      return
+    }
+    if (!formData.get('model')) {
+      setError('Please enter a model.')
       return
     }
 
@@ -54,13 +59,12 @@ export default function NewSightingForm({ initialColorSlug }: { initialColorSlug
               <ColorPicker initialSlug={initialColorSlug} />
             </div>
             <div className="field">
-              <label htmlFor="model">Model</label>
-              <select id="model" name="model" required defaultValue="">
-                <option value="" disabled>Choose a model</option>
-                {MODELS.map((model) => (
-                  <option key={model} value={model}>{model}</option>
-                ))}
-              </select>
+              <label>Model</label>
+              <SearchableSelect
+                items={MODELS}
+                name="model"
+                placeholder="Search model, generation, trim…"
+              />
             </div>
             <div className="field">
               <label htmlFor="model_year">Year</label>
