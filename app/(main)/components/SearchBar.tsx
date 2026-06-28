@@ -81,7 +81,7 @@ export default function SearchBar() {
       <input
         id="globalSearch"
         type="search"
-        placeholder="Search paint, code, model, year"
+        placeholder="Search paint color"
         value={value}
         autoComplete="off"
         onChange={(e) => {
