@@ -5,6 +5,16 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getColorBySlug } from '@/lib/colors'
 
+const ALLOWED_IMAGE_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'])
+const MAX_PHOTO_SIZE = 10 * 1024 * 1024 // 10 MB
+
+function isValidPhoto(file: File | null): file is File {
+  if (!file || file.size === 0) return false
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) return false
+  if (file.size > MAX_PHOTO_SIZE) return false
+  return true
+}
+
 export async function login(formData: FormData) {
   const supabase = await createClient()
 
@@ -88,7 +98,7 @@ export async function createSighting(formData: FormData) {
   // Upload up to 3 photos into sighting_photo table
   for (let i = 0; i < 3; i++) {
     const photoFile = formData.get(`photo_${i}`) as File | null
-    if (!photoFile || photoFile.size === 0) continue
+    if (!isValidPhoto(photoFile)) continue
     const position = (formData.get(`photo_${i}_position`) as string) || '50% 50%'
     const scale = parseFloat((formData.get(`photo_${i}_scale`) as string) || '1') || 1
     const ext = photoFile.type.split('/')[1] || 'jpg'
@@ -185,22 +195,25 @@ export async function updateSighting(id: string, formData: FormData) {
     await supabase.from('sighting_photo').delete().in('id', deletePhotoIds)
   }
 
-  // Update position/scale on kept existing photos
+  // Update position/scale on kept existing photos (parallel, skip if unchanged)
   const { data: keptPhotos } = await supabase
     .from('sighting_photo')
     .select('id, photo_position, photo_scale')
     .eq('sighting_id', id)
-  for (const photo of keptPhotos ?? []) {
-    const position = (formData.get(`existing_${photo.id}_position`) as string) || photo.photo_position
-    const scale = parseFloat((formData.get(`existing_${photo.id}_scale`) as string) || String(photo.photo_scale)) || photo.photo_scale
-    await supabase.from('sighting_photo').update({ photo_position: position, photo_scale: scale }).eq('id', photo.id)
-  }
+  await Promise.all(
+    (keptPhotos ?? []).map((photo) => {
+      const position = (formData.get(`existing_${photo.id}_position`) as string) || photo.photo_position
+      const scale = parseFloat((formData.get(`existing_${photo.id}_scale`) as string) || String(photo.photo_scale)) || photo.photo_scale
+      if (position === photo.photo_position && scale === photo.photo_scale) return Promise.resolve()
+      return supabase.from('sighting_photo').update({ photo_position: position, photo_scale: scale }).eq('id', photo.id)
+    })
+  )
 
   // Upload new photos
   const currentCount = (keptPhotos?.length ?? 0)
   for (let i = 0; i < 3; i++) {
     const photoFile = formData.get(`new_photo_${i}`) as File | null
-    if (!photoFile || photoFile.size === 0) continue
+    if (!isValidPhoto(photoFile)) continue
     const position = (formData.get(`new_photo_${i}_position`) as string) || '50% 50%'
     const scale = parseFloat((formData.get(`new_photo_${i}_scale`) as string) || '1') || 1
     const ext = photoFile.type.split('/')[1] || 'jpg'

@@ -1,5 +1,5 @@
-import { notFound, redirect } from 'next/navigation'
-import { fetchCollectorData } from '@/lib/collector'
+import { redirect } from 'next/navigation'
+import { fetchSighting } from '@/lib/collector'
 import EditSightingForm from './EditSightingForm'
 
 export default async function EditSightingPage({
@@ -8,15 +8,10 @@ export default async function EditSightingPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const collector = await fetchCollectorData()
+  const sighting = await fetchSighting(id)
 
-  if (!collector) {
-    redirect('/login')
-  }
-
-  const sighting = collector.sightings.find((entry) => entry.id === id)
   if (!sighting) {
-    notFound()
+    redirect('/login')
   }
 
   return <EditSightingForm sighting={sighting} />

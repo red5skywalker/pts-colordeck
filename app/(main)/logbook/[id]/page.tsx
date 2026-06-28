@@ -1,11 +1,11 @@
 import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { deleteSighting } from '@/app/actions'
 import { colorImagePath, getColorBySlug } from '@/lib/colors'
 import { formatDate, rarityClass, getSightingPhotos } from '@/lib/app-data'
-import { fetchCollectorData } from '@/lib/collector'
+import { fetchSighting } from '@/lib/collector'
 import PhotoCarousel from '@/app/(main)/components/PhotoCarousel'
+import DeleteSightingButton from './DeleteSightingButton'
 
 export default async function SightingDetailPage({
   params,
@@ -13,25 +13,15 @@ export default async function SightingDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const collector = await fetchCollectorData()
+  const sighting = await fetchSighting(id)
 
-  if (!collector) {
-    redirect('/login')
-  }
-
-  const sighting = collector.sightings.find((entry) => entry.id === id)
   if (!sighting) {
-    notFound()
+    redirect('/login')
   }
 
   const color = getColorBySlug(sighting.color_slug)
   if (!color) {
     notFound()
-  }
-
-  async function removeSighting() {
-    'use server'
-    await deleteSighting(id)
   }
 
   const photos = getSightingPhotos(sighting)
@@ -127,11 +117,7 @@ export default async function SightingDetailPage({
           <section className="panel">
             <h2>Notes</h2>
             <p>{sighting.notes ?? 'No notes yet.'}</p>
-            <form action={removeSighting}>
-              <button type="submit" className="ghost-button" style={{ color: 'var(--red)' }}>
-                Delete sighting
-              </button>
-            </form>
+            <DeleteSightingButton sightingId={id} />
           </section>
         </aside>
       </div>
