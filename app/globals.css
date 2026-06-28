@@ -511,6 +511,8 @@ p {
   display: grid;
   gap: 22px;
   padding: 2px 0 0;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
 .filter-panel h2 {
