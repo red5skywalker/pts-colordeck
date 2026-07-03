@@ -40,7 +40,7 @@ export default function LoginPage() {
         {/* Brand */}
         <div style={{ marginBottom: '2rem' }}>
           <p className="eyebrow" style={{ margin: 0 }}>Paint archive</p>
-          <h2 style={{ margin: '4px 0 0', fontSize: 28 }}>Rare Shades</h2>
+          <h2 style={{ margin: '4px 0 0', fontSize: 28 }}>Color Deck</h2>
         </div>
 
         <h3 style={{ marginBottom: 4 }}>Welcome back</h3>
